@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chattix</title>
+</head>
+<body>
+    <h1>Hello chattix</h1>
+    <textarea  id="all_chats" cols="100" rows="20">
+        
+    </textarea><br><br>
+    <input type="text" id="chat_input_msg" size="86"><br><br>
+    <input type="button" value="send" id="mssg_send_btn">
+    
+    <script>
+        var ws= new  WebSocket('ws://127.0.0.1:8000/ws/sc/')
+        ws.onopen= function(){
+            console.log('websocket connection open');
+            // ws.send('hello server')
+        }
+        ws.onmessage= function(event){
+            console.log('websocket message', event);
+            console.log("mesage form client...", event.data);
+            const user_msg=JSON.parse(event.data)
+            console.log("user data.....", user_msg);
+            document.querySelector('#all_chats').value += (user_msg.msg +'\n')
+           
+        }
+        ws.onerror= function(){
+            console.log('websocket errors');
+        }
+        ws.onclose= function(){
+            console.log('websocket close');
+        }
+
+        document.getElementById('mssg_send_btn').onclick =function (event) {
+            const input_message= document.getElementById('chat_input_msg')
+            const message= input_message.value
+            ws.send(JSON.stringify({
+                'msg':message
+            }))
+            input_message.value = '';
+        }
+
+    </script>
+</body>
+</html>
